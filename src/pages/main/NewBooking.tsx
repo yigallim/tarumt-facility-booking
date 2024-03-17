@@ -70,7 +70,6 @@ const NewBooking = () => {
   }));
 
   const validateTimeRange = (_: any, value: { start_time?: number; end_time?: number }) => {
-    console.log(value);
     if (value == undefined || value.start_time == undefined || value.end_time == undefined)
       return Promise.reject("Please select both start and end time!");
 

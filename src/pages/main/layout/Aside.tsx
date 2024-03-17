@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 import useApp from "../../../hooks/useApp";
 import getLastPath from "../../../utils/getLastPath";
 import WarningBlame from "../../../components/WarningBlame";
+import useBookingState from "../../../hooks/states/useBookingState";
 
 const Aside = () => {
+  const { bookings } = useBookingState();
   const [currentTime, setCurrentTime] = useState(new Date());
   const { pathname } = useLocation();
   const { notification } = useApp();
@@ -45,7 +47,9 @@ const Aside = () => {
             Details
           </Link>
         </Flex>
-        <Typography.Text style={{ fontSize: 24 }}>10</Typography.Text>
+        <Typography.Text style={{ fontSize: 24 }}>
+          {bookings.filter((booking) => booking.status === "pending").length}
+        </Typography.Text>
       </Card>
       <WarningBlame />
     </Flex>

@@ -96,6 +96,13 @@ const BookingHistory = () => {
       key: "facility_id",
       render: (facilityId: string) => getFacilityName(facilityId),
     },
+    Table.EXPAND_COLUMN,
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => <BookingStatus>{status}</BookingStatus>,
+    },
     {
       title: "Booking Date",
       dataIndex: "book_date",
@@ -113,13 +120,7 @@ const BookingHistory = () => {
       key: "end_time",
       render: (end_time: number) => convertToAMPM(end_time),
     },
-    Table.EXPAND_COLUMN,
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => <BookingStatus>{status}</BookingStatus>,
-    },
+
     {
       title: "Action",
       key: "action",
@@ -165,7 +166,7 @@ const BookingHistory = () => {
               <Flex vertical style={{ padding: "6px 12px" }}>
                 <Typography.Text strong>Message: </Typography.Text>
                 <Typography.Text>
-                  {record.response_msg || `Triggering Soon in 12:00AM ${formattedThreeDaysBefore}`}
+                  {record.response_msg || `Triggering soon in 12:00AM ${formattedThreeDaysBefore}`}
                 </Typography.Text>
               </Flex>
             );
