@@ -12,6 +12,8 @@ import { getFacilities } from "./api/facilitites";
 import useFacilityState from "./hooks/states/useFacilityState";
 import useAccountState from "./hooks/states/useAccountState";
 import { getAccounts } from "./api/accounts";
+import useBookingState from "./hooks/states/useBookingState";
+import { getBookings } from "./api/bookings";
 
 function ToLogin() {
   const { message } = useApp();
@@ -36,6 +38,7 @@ function ToHome() {
 const App = () => {
   const { setFacilities } = useFacilityState();
   const { setAccounts } = useAccountState();
+  const { setBookings } = useBookingState();
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -49,8 +52,13 @@ const App = () => {
         const { data, error } = await getAccounts();
         if (!error) setAccounts(data);
       }
+      async function fetchBooking() {
+        const { data, error } = await getBookings();
+        if (!error) setBookings(data);
+      }
       fetchFacility();
       fetchAccount();
+      fetchBooking();
     }
   }, [user]);
 
