@@ -108,17 +108,25 @@ const NewBooking = () => {
 
     const { error } = await addBooking(payload);
     if (error) {
-      notification.error({
-        message: "Failed To Add Booking",
-        description: "Unexpected error occurred, please try again.",
-      });
+      if (error.code && error.code === "P0001") {
+        notification.error({
+          message: "Failed To Add Booking",
+          description:
+            'Maximum booking count limit reached, you can only have maximum 30 "pending" bookings.',
+        });
+      } else {
+        notification.error({
+          message: "Failed To Add Booking",
+          description: "Unexpected error occurred, please try again.",
+        });
+      }
     } else {
       notification.success({
         message: "Added Successfully",
         description: "You've added a scheduled booking successfully",
       });
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
@@ -217,5 +225,5 @@ const NewBooking = () => {
     </Form>
   );
 };
-
+//TODO: reset form after submit, db validation on fields check wether have totally same fields.
 export default NewBooking;
