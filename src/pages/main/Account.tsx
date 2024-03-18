@@ -1,20 +1,84 @@
 import { useEffect, useRef, useState } from "react";
-import { Table, Space, Popconfirm, Button, Modal, Form, Input, FormInstance } from "antd";
+import {
+  Table,
+  Space,
+  Popconfirm,
+  Button,
+  Modal,
+  Form,
+  Input,
+  FormInstance,
+  Badge,
+  Row,
+  Col,
+} from "antd";
 import { EyeOutlined, EyeInvisibleOutlined, PlusOutlined } from "@ant-design/icons";
 import { addAccount, deleteAccount, editAccount, getAccounts } from "../../api/accounts";
 import useAccountState, { UserData } from "../../hooks/states/useAccountState";
 import useApp from "../../hooks/useApp";
 import { InsertType } from "../../types/helper";
+import { validateCredentials } from "../../api/validate-credentails";
 
 interface ModalFormProps {
   open: boolean;
   onCancel: () => void;
   mode: "add" | "edit";
   form: FormInstance;
-  onFinish: (values: UserData) => void;
+  onFinish: (values: SubmitValues) => void;
 }
 
+type VerifyType = undefined | boolean;
+
+type SubmitValues = InsertType<"accounts"> & {
+  verify: VerifyType;
+};
+
 const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => {
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verified, setVerified] = useState<undefined | boolean>(undefined);
+
+  useEffect(() => {
+    setVerified(undefined);
+  }, [open]);
+
+  const handleCredentialsChange = () => {
+    form.setFieldValue("verify", undefined);
+    setVerified(undefined);
+  };
+
+  const verifyCredentials = async () => {
+    setVerifyLoading(true);
+    try {
+      await form.validateFields(["name", "student_id", "password"]);
+      const { student_id, password } = form.getFieldsValue(["student_id", "password"]);
+      const isValid = await validateCredentials({ username: student_id, password });
+      form.setFieldValue("verify", isValid);
+      setVerified(isValid);
+      form.validateFields(["verify"]);
+    } catch (err) {
+      return;
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
+  const validateVerifyField = (_: any, value: boolean) => {
+    if (value === undefined || value) {
+      return Promise.resolve();
+    } else {
+      return Promise.reject("Please provide an account with valid credentials!");
+    }
+  };
+
+  const statusMsg =
+    verified === undefined
+      ? "Not Verified."
+      : verified
+      ? "Account Credentials Is Valid"
+      : "Account Credentials Is Not Valid";
+
+  const badgeStatus = verified === undefined ? "warning" : verified ? "success" : "error";
+
   return (
     <Modal
       forceRender
@@ -39,7 +103,7 @@ const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => 
             { pattern: /^[0-9]{7}$/, message: "Student ID should contain 7 digits only!" },
           ]}
         >
-          <Input autoComplete="username" />
+          <Input autoComplete="username" onChange={handleCredentialsChange} />
         </Form.Item>
         <Form.Item
           label="Password"
@@ -53,7 +117,27 @@ const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => 
             },
           ]}
         >
-          <Input.Password autoComplete="current-password" />
+          <Input.Password autoComplete="current-password" onChange={handleCredentialsChange} />
+        </Form.Item>
+
+        <Form.Item
+          name="verify"
+          rules={[
+            { validator: validateVerifyField },
+            { required: true, message: "Please verify your account credentials first!" },
+          ]}
+          extra="We must make sure that the account credentials provided is authorized in thr intranet."
+        >
+          <Row gutter={8}>
+            <Col flex={1}>
+              <Badge status={badgeStatus} text={statusMsg} />
+            </Col>
+            <Col>
+              <Button loading={verifyLoading} size="small" onClick={verifyCredentials}>
+                Verify Account
+              </Button>
+            </Col>
+          </Row>
         </Form.Item>
 
         <Space style={{ width: "100%", justifyContent: "end" }}>
@@ -73,7 +157,7 @@ const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => 
 const Account = () => {
   const [showPasswordsFor, setShowPasswordsFor] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [form] = Form.useForm<UserData>();
+  const [form] = Form.useForm<SubmitValues>();
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const edittingAccountId = useRef<string | null>(null);
   const previousFormValues = useRef<InsertType<"accounts"> | null>(null);
@@ -108,7 +192,8 @@ const Account = () => {
   };
 
   const handleEdit = (record: UserData) => {
-    form.setFieldsValue(record);
+    form.resetFields();
+    form.setFieldsValue({ ...record, verify: undefined });
     setModalMode("edit");
     previousFormValues.current = {
       name: record.name,
@@ -149,7 +234,8 @@ const Account = () => {
     setModalOpen(false);
   };
 
-  const onFinish = async (values: InsertType<"accounts">) => {
+  const onFinish = async (values: SubmitValues) => {
+    values.verify = undefined;
     setLoading(true);
     setModalOpen(false);
     if (modalMode === "add") {
