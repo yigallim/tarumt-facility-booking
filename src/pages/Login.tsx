@@ -33,7 +33,7 @@ const Login = () => {
         });
       } else {
         notification.error({
-          message: "Failed to register",
+          message: "Failed to Login",
           description: "Unexpected error occured, please try again.",
         });
       }

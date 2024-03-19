@@ -209,13 +209,17 @@ const BookingHistory = () => {
                     <a>Delete</a>
                   </Popconfirm>,
                 ]}
+                style={{ position: "relative" }}
               >
                 <List.Item.Meta
-                  style={{ marginBottom: 0 }}
+                  style={{ marginBottom: 6 }}
                   title={index + 1 + ". " + getFacilityName(item.facility_id)}
                 />
-                <Space direction="vertical" style={{ width: "100%" }}>
+                <div style={{ position: "absolute", right: 0, top: 12 }}>
                   <BookingStatus>{item.status}</BookingStatus>
+                </div>
+
+                <Space direction="vertical" style={{ width: "100%" }}>
                   <Flex gap={24} justify="space-between" align="center">
                     <Space size={4} direction="vertical">
                       <div>Booked By :</div>
