@@ -26,7 +26,12 @@ const iconStatusMap: Record<string, React.ReactNode> = {
 
 const BookingStatus = ({ children }: BookingStatusProps) => {
   return (
-    <Tag bordered={false} color={colorStatusMap[children]} icon={iconStatusMap[children]}>
+    <Tag
+      style={{ height: "min-content", margin: 0 }}
+      bordered={false}
+      color={colorStatusMap[children]}
+      icon={iconStatusMap[children]}
+    >
       {textStatusMap[children]}
     </Tag>
   );

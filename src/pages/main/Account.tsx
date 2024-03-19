@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
   Space,
@@ -11,6 +11,8 @@ import {
   Badge,
   Row,
   Col,
+  List,
+  Typography,
 } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined, PlusOutlined } from "@ant-design/icons";
 import { addAccount, deleteAccount, editAccount, getAccounts } from "../../api/accounts";
@@ -18,6 +20,7 @@ import useAccountState, { UserData } from "../../hooks/states/useAccountState";
 import useApp from "../../hooks/useApp";
 import { InsertType } from "../../types/helper";
 import { validateCredentials } from "../../api/validate-credentails";
+import useBreakpoint from "../../hooks/useBreakPoint";
 
 interface ModalFormProps {
   open: boolean;
@@ -155,6 +158,7 @@ const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => 
 };
 
 const Account = () => {
+  const { md } = useBreakpoint();
   const [showPasswordsFor, setShowPasswordsFor] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm<SubmitValues>();
@@ -332,14 +336,64 @@ const Account = () => {
       <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
         Add Account
       </Button>
-      <Table
-        loading={loading}
-        scroll={{ x: 540 }}
-        size="small"
-        columns={columns}
-        dataSource={accounts}
-        rowKey="_id"
-      />
+      {md ? (
+        <Table
+          loading={loading}
+          scroll={{ x: 540 }}
+          size="small"
+          columns={columns}
+          dataSource={accounts}
+          rowKey="_id"
+        />
+      ) : (
+        <List
+          loading={loading}
+          pagination={{ position: "bottom", align: "center" }}
+          dataSource={accounts}
+          renderItem={(item: UserData, index: number) => (
+            <List.Item
+              actions={[
+                <a key="edit" onClick={() => handleEdit(item)}>
+                  Edit
+                </a>,
+                <Popconfirm
+                  key="delete"
+                  title="Sure to delete?"
+                  onConfirm={() => handleDelete(item)}
+                >
+                  <a>Delete</a>
+                </Popconfirm>,
+              ]}
+            >
+              <List.Item.Meta
+                title={index + 1 + ". " + item.name}
+                description={
+                  <Space direction="vertical" size={4} style={{ marginTop: 6 }}>
+                    <Typography.Text>Student ID : {item.student_id}</Typography.Text>
+                    <Typography.Text>
+                      Password :{" "}
+                      {showPasswordsFor.includes(item._id)
+                        ? item.password
+                        : "*".repeat(item.password.length)}
+                      {showPasswordsFor.includes(item._id) ? (
+                        <EyeInvisibleOutlined
+                          style={{ marginLeft: 8 }}
+                          onClick={() => togglePasswordVisibility(item._id)}
+                        />
+                      ) : (
+                        <EyeOutlined
+                          style={{ marginLeft: 8 }}
+                          onClick={() => togglePasswordVisibility(item._id)}
+                        />
+                      )}
+                    </Typography.Text>
+                  </Space>
+                }
+              />
+            </List.Item>
+          )}
+        />
+      )}
       <ModalForm
         mode={modalMode}
         open={modalOpen}

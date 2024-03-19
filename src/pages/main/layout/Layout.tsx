@@ -18,7 +18,11 @@ const Layout = () => {
       <TopBar />
       <Flex
         vertical={!md}
-        style={{ padding: md ? "24px 36px 24px 36px" : "24px 16px 24px 16px", flex: 1 }}
+        style={{
+          padding: md ? "24px 36px 24px 36px" : "24px 16px 24px 16px",
+          flex: 1,
+          marginTop: 56,
+        }}
         gap={md ? 36 : 18}
       >
         {md ? (

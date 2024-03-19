@@ -3,3 +3,7 @@ body,
 #root {
   height: 100%;
 }
+
+.ant-list-item-action {
+  margin-inline-start: 0 !important;
+}

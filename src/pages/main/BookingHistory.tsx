@@ -1,23 +1,25 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Flex, Popconfirm, Space, Table, Typography } from "antd";
+import { Button, Flex, List, Popconfirm, Space, Table, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import BookingStatus from "../../components/BookingStatus";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { deleteBooking, getBookings } from "../../api/bookings";
 import useAccountState from "../../hooks/states/useAccountState";
 import useBookingState from "../../hooks/states/useBookingState";
 import useFacilityState from "../../hooks/states/useFacilityState";
 import { Tables } from "../../types/supabase";
 import useApp from "../../hooks/useApp";
+import useBreakpoint from "../../hooks/useBreakPoint";
 
 function convertToAMPM(hour: number): string {
   const time = hour % 12 === 0 ? 12 : hour % 12;
   const suffix = hour < 12 ? "AM" : "PM";
   const formattedTime = time.toString().padStart(2, "0");
-  return formattedTime + ":00 " + suffix;
+  return formattedTime + ":00" + suffix;
 }
 
 const BookingHistory = () => {
+  const { md } = useBreakpoint();
   const { notification } = useApp();
   const { facilities } = useFacilityState();
   const { accounts } = useAccountState();
@@ -139,11 +141,8 @@ const BookingHistory = () => {
     },
   ];
 
-  return (
-    <Space direction="vertical" size={16}>
-      <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-        Add Bookings
-      </Button>
+  const tableDom = useMemo<React.ReactNode>(() => {
+    return (
       <Table
         rowKey="_id"
         scroll={{ x: 800 }}
@@ -173,6 +172,72 @@ const BookingHistory = () => {
           },
         }}
       />
+    );
+  }, [bookings, loading]);
+
+  return (
+    <Space direction="vertical" size={16}>
+      <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+        Add Bookings
+      </Button>
+      {md ? (
+        tableDom
+      ) : (
+        <List
+          loading={loading}
+          itemLayout="vertical"
+          pagination={{ position: "bottom", align: "center" }}
+          dataSource={bookings}
+          renderItem={(item: Tables<"bookings">, index: number) => {
+            const bookDate = new Date(item.book_date);
+            const threeDaysBefore = new Date(bookDate);
+            threeDaysBefore.setDate(bookDate.getDate() - 2);
+            const formattedThreeDaysBefore = `${threeDaysBefore.getFullYear()}-${(
+              threeDaysBefore.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}-${threeDaysBefore.getDate().toString().padStart(2, "0")}`;
+
+            return (
+              <List.Item
+                actions={[
+                  <Popconfirm
+                    key="delete"
+                    title="Sure to delete?"
+                    onConfirm={() => handleDelete(item)}
+                  >
+                    <a>Delete</a>
+                  </Popconfirm>,
+                ]}
+              >
+                <List.Item.Meta
+                  style={{ marginBottom: 0 }}
+                  title={index + 1 + ". " + getFacilityName(item.facility_id)}
+                />
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <BookingStatus>{item.status}</BookingStatus>
+                  <Flex gap={24} justify="space-between" align="center">
+                    <Space size={4} direction="vertical">
+                      <div>Booked By :</div>
+                      <div>{getAccountInfo(item.account_id)}</div>
+                    </Space>
+                    <Space align="end" size={4} direction="vertical">
+                      <div>{item.book_date}</div>
+                      <div>
+                        {convertToAMPM(item.start_time)} - {convertToAMPM(item.end_time)}
+                      </div>
+                    </Space>
+                  </Flex>
+                  <Typography.Text type="secondary">
+                    Message :{" "}
+                    {item.response_msg || `Triggering soon in 12:00AM ${formattedThreeDaysBefore}`}
+                  </Typography.Text>
+                </Space>
+              </List.Item>
+            );
+          }}
+        />
+      )}
     </Space>
   );
 };

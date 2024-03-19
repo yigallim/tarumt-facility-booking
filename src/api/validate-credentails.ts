@@ -9,6 +9,6 @@ export async function validateCredentials(credentials: CrendetialsType): Promise
   const { data } = await supabase.functions.invoke("validate-credentials", {
     body: JSON.stringify(credentials),
   });
-  if (data.valid !== undefined && data.valid == true) return true;
+  if (data && data.valid !== undefined && data.valid == true) return true;
   else return false;
 }
