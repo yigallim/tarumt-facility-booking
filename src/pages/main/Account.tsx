@@ -114,9 +114,9 @@ const ModalForm = ({ open, onCancel, mode, form, onFinish }: ModalFormProps) => 
           rules={[
             { required: true, message: "Please input the password!" },
             {
-              pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/,
+              pattern: /^(?=.*[A-Za-z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/,
               message:
-                "Password should contain at least one alphabet, one numeric, and one special character, and be at least 8 characters long!",
+                "Password should contain at least one alphabet, one special character, and be at least 8 characters long!",
             },
           ]}
         >
