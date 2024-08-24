@@ -11,6 +11,14 @@ import { Tables } from "../../types/supabase";
 import useApp from "../../hooks/useApp";
 import useBreakpoint from "../../hooks/useBreakPoint";
 
+function getDatewithDay(bookDate: string) {
+  const date = new Date(bookDate);
+  const dayOfWeek = date.getDay();
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const formattedDate = date.toISOString().split("T")[0];
+  return `${formattedDate} ${daysOfWeek[dayOfWeek]}`;
+}
+
 function convertToAMPM(hour: number): string {
   const time = hour % 12 === 0 ? 12 : hour % 12;
   const suffix = hour < 12 ? "AM" : "PM";
@@ -109,6 +117,7 @@ const BookingHistory = () => {
       title: "Booking Date",
       dataIndex: "book_date",
       key: "book_date",
+      render: (bookDate: string) => getDatewithDay(bookDate),
     },
     {
       title: "Start Time",
@@ -226,7 +235,7 @@ const BookingHistory = () => {
                       <div>{getAccountInfo(item.account_id)}</div>
                     </Space>
                     <Space align="end" size={4} direction="vertical">
-                      <div>{item.book_date}</div>
+                      <div>{getDatewithDay(item.book_date)}</div>
                       <div>
                         {convertToAMPM(item.start_time)} - {convertToAMPM(item.end_time)}
                       </div>
