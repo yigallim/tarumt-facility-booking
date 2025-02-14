@@ -32,6 +32,12 @@ const BookingHistory = () => {
   const { facilities } = useFacilityState();
   const { accounts } = useAccountState();
   const { bookings, setBookings, loading, setLoading } = useBookingState();
+
+  const indexedBookings = useMemo(
+    () => bookings.map((booking, index) => ({ ...booking, index: index + 1 })),
+    [bookings]
+  );
+
   const navigate = useNavigate();
 
   const handleAdd = () => {
@@ -92,7 +98,6 @@ const BookingHistory = () => {
       title: "#",
       dataIndex: "index",
       key: "index",
-      render: (_: string, __: any, index: number) => index + 1,
     },
     {
       title: "Account",
@@ -157,7 +162,7 @@ const BookingHistory = () => {
         scroll={{ x: 800 }}
         size="small"
         columns={columns}
-        dataSource={bookings}
+        dataSource={indexedBookings}
         loading={loading}
         expandable={{
           expandedRowRender: (record) => {
