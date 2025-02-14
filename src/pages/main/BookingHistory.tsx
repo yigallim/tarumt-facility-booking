@@ -225,25 +225,28 @@ const BookingHistory = () => {
                 ]}
                 style={{ position: "relative" }}
               >
-                <List.Item.Meta
-                  style={{ marginBottom: 6 }}
-                  title={index + 1 + ". " + getFacilityName(item.facility_id)}
-                />
-                <div style={{ position: "absolute", right: 0, top: 12 }}>
+                <Flex gap={24} justify="space-between">
+                  <List.Item.Meta
+                    style={{ marginBottom: 6, textWrap: "nowrap" }}
+                    title={index + 1 + ". " + getFacilityName(item.facility_id)}
+                  />
                   <BookingStatus>{item.status}</BookingStatus>
-                </div>
-
+                </Flex>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <Flex gap={24} justify="space-between" align="center">
                     <Space size={4} direction="vertical">
-                      <div>Booked By :</div>
-                      <div>{getAccountInfo(item.account_id)}</div>
+                      <Typography.Text style={{ textWrap: "nowrap" }}>Booked By :</Typography.Text>
+                      <Typography.Text style={{ textWrap: "nowrap" }}>
+                        {getAccountInfo(item.account_id)}
+                      </Typography.Text>
                     </Space>
                     <Space align="end" size={4} direction="vertical">
-                      <div>{getDatewithDay(item.book_date)}</div>
-                      <div>
+                      <Typography.Text style={{ textWrap: "nowrap" }}>
+                        {getDatewithDay(item.book_date)}
+                      </Typography.Text>
+                      <Typography.Text style={{ textWrap: "nowrap" }}>
                         {convertToAMPM(item.start_time)} - {convertToAMPM(item.end_time)}
-                      </div>
+                      </Typography.Text>
                     </Space>
                   </Flex>
                   <Typography.Text type="secondary">
