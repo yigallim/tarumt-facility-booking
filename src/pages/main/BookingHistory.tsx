@@ -201,8 +201,8 @@ const BookingHistory = () => {
           loading={loading}
           itemLayout="vertical"
           pagination={{ position: "bottom", align: "center" }}
-          dataSource={bookings}
-          renderItem={(item: Tables<"bookings">, index: number) => {
+          dataSource={indexedBookings}
+          renderItem={(item) => {
             const bookDate = new Date(item.book_date);
             const threeDaysBefore = new Date(bookDate);
             threeDaysBefore.setDate(bookDate.getDate() - 2);
@@ -228,7 +228,7 @@ const BookingHistory = () => {
                 <Flex gap={24} justify="space-between">
                   <List.Item.Meta
                     style={{ marginBottom: 6, textWrap: "nowrap" }}
-                    title={index + 1 + ". " + getFacilityName(item.facility_id)}
+                    title={item.index + ". " + getFacilityName(item.facility_id)}
                   />
                   <BookingStatus>{item.status}</BookingStatus>
                 </Flex>
